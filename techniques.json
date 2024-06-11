@@ -1,0 +1,23 @@
+{
+    "Visión Elemental": {
+        "name": "Visión Elemental",
+        "type": "Mejora",
+        "action_type": "Reacción al inicio del turno",
+        "element": null,
+        "usage": "Permanente",
+        "action_points": 0,
+        "range": "Personal",
+        "area": "Tu",
+        "duration": "Combate",
+        "saving_throw": "No",
+        "requirement": null,
+        "effect": "Al comenzar cada combate, el personaje debe realizar una T.T de entendimiento(Elemental) con una dificultad (Desafiante) para sentir el flujo de las energías elementales...",
+        "attack": null,
+        "impact": null,
+        "advancements": {
+            "2": "Resonancia Nivel 2: Al canalizar tu elemento con la vision, ahora también recibes una resistencia de 1 por cada 4 niveles de jugador contra ataques de ese mismo elemento.",
+            "3": "Resonancia Nivel 3: La potencia de las maniobras o ataques con arma basadas en tu elemento actual se amplifica aún más. Además, tus ataques elementales tienen una pequeña posibilidad de aplicar un efecto secundario relacionado con ese elemento.",
+            "4": "Resonancia Nivel 4: La dificultad de las pruebas generadas por tus maniobras aumenta al siguiente nivel. Además, Entiendes que el poder no viene sin un precio. Una vez por combate, puedes optar por potenciar una de tus maniobras relacionadas con tu elemento pagando un sacrificio..."
+        }
+    }
+}

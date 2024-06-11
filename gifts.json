@@ -1,0 +1,16 @@
+{
+    "Visiones Reveladoras": {
+        "name": "Visiones Reveladoras",
+        "type": "Mejora",
+        "action_type": "Habilidad Activa T.T (Decifrar Escritura)",
+        "element": null,
+        "usage": "Permanente",
+        "action_points": 1,
+        "range": "Personal",
+        "area": "Tu",
+        "duration": "Instantáneo",
+        "saving_throw": "No",
+        "requirement": "Visión Elemental",
+        "effect": "El Poseido puede realizar pruebas de Decifrar Escritura en combate usando su Sabiduría en lugar de su Intelecto. Al hacerlo, su visión elemental le permite “leer” pequeños rastros de energia en el cuerpo de la criatura objetivo..."
+    }
+}

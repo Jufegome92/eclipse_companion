@@ -1,0 +1,18 @@
+{
+    "Guardia Elemental": {
+        "name": "Guardia Elemental",
+        "type": "Mejora",
+        "action_type": "Habilidad Activa",
+        "element": null,
+        "usage": "Único",
+        "action_points": 2,
+        "range": "Personal",
+        "area": "Tu",
+        "duration": "Cantidad de rondas iguales a tu Sabiduría",
+        "saving_throw": "No",
+        "requirement": "Visión Elemental",
+        "effect": "Adoptas una postura defensiva imbuida con energía elemental. Incrementas tu armadura en +1 por cada 7 niveles de jugador y recibes un beneficio según tu visión elemental...",
+        "attack": null,
+        "impact": null
+    }
+}

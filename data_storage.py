@@ -1,6 +1,32 @@
 from data_definitions import Weapon, Armor, LegArmor, Boots, Bracers, Helmet, Shield, Jewelry
-from data_definitions import Characteristics, Qualities, Health, Fatigue, Sanity, InstinctiveReactions, Specializations, Competences, Player, Species, calculate_load_capacity,predefined_specializations, specializations
-import math 
+from data_definitions import Characteristics, Qualities, Health, Fatigue, Sanity, InstinctiveReactions, Specializations, Competences, Player, Species, calculate_load_capacity, predefined_specializations, specializations
+from data_definitions import Technique, Maneuver, Gift, techniques, maneuvers, gifts
+import json
+import math
+
+with open('techniques.json') as file:
+    technique_data = json.load(file)
+    for name, data in technique_data.items():
+        techniques[name] = Technique(**data)
+
+with open('maneuvers.json') as file:
+    maneuver_data = json.load(file)
+    for name, data in maneuver_data.items():
+        maneuvers[name] = Maneuver(**data)
+
+with open('gifts.json') as file:
+    gift_data = json.load(file)
+    for name, data in gift_data.items():
+        gifts[name] = Gift(**data)
+
+def get_techniques():
+    return techniques
+
+def get_maneuvers():
+    return maneuvers
+
+def get_gifts():
+    return gifts
 
 weapons = {
     "armas_de_asta": [
@@ -242,7 +268,7 @@ boots = {
         tc_penalty=lambda grade: -(grade + 1),
         weight=3,
         grade=1,
-        description="Bonificación a las T.R de alteraciones contra derribo, desplazamiento y desequilibrio igual al grado de la pieza."
+        description=["Bonificación a las T.R de alteraciones contra derribo, desplazamiento y desequilibrio igual al grado de la pieza."]
     )
 }
 
@@ -254,7 +280,7 @@ bracers = {
         te_penalty=None,
         weight=2,
         grade=1,
-        description="Bonificación a la T.A durante las reacciones instintivas igual al grado de la pieza."
+        description=["Bonificación a la T.A durante las reacciones instintivas igual al grado de la pieza."]
     ),
     "brazales_intermedios": Bracers(
         name="Brazales Intermedios",
@@ -263,7 +289,7 @@ bracers = {
         te_penalty=lambda characteristics, competencies, grade: -grade,
         weight=3,
         grade=1,
-        description="Bonificación a la T.A al llevar a cabo maniobras de disciplina y armas igual al grado de la pieza."
+        description=["Bonificación a la T.A al llevar a cabo maniobras de disciplina y armas igual al grado de la pieza."]
     ),
     "brazales_pesados": Bracers(
         name="Brazales Pesados",
@@ -272,7 +298,7 @@ bracers = {
         te_penalty=lambda characteristics, competencies, grade: -(grade + 1),
         weight=4,
         grade=1,
-        description="Bonificación a la T.A o T.D al llevar a cabo maniobras de escudos igual al grado de la pieza."
+        description=["Bonificación a la T.A o T.D al llevar a cabo maniobras de escudos igual al grado de la pieza."]
     )
 }
 
@@ -280,7 +306,7 @@ helmets = {
     "casco_ligero": Helmet(
         name="Casco Ligero",
         category="Ligero",
-        bonus=lambda characteristics, competencies, grade: characteristics["preparation"] + grade,
+        bonus=lambda grade: grade,
         te_penalty=None,
         weight=1,
         grade=1
@@ -288,19 +314,19 @@ helmets = {
     "casco_intermedio": Helmet(
         name="Casco Intermedio",
         category="Intermedio",
-        bonus=lambda characteristics, competencies, grade: competencies["focus"] + grade,
-        te_penalty=lambda characteristics, competencies, grade: -grade,
+        bonus=lambda grade: grade,
+        te_penalty=lambda grade: -grade,
         weight=2,
         grade=1
     ),
     "casco_pesado": Helmet(
         name="Casco Pesado",
         category="Pesado",
-        bonus=lambda characteristics, competencies, grade: grade,
-        te_penalty=lambda characteristics, competencies, grade: -(grade + 1),
+        bonus=lambda grade: grade,
+        te_penalty=lambda grade: -(grade + 1),
         weight=3,
         grade=1,
-        description="Bonificación a las T.R de alteraciones contra conmoción, ceguera y aturdimiento igual al grado de la pieza."
+        description=["Bonificación a las T.R de alteraciones contra conmoción, ceguera y aturdimiento igual al grado de la pieza."]
     )
 }
 
@@ -339,7 +365,7 @@ jewelry = {
         category="Amuleto",
         bonus=amulet_bonus,
         weight=0.1,
-        description="Bonificación a aguante, cordura o preparación igual al grado (elige uno)."
+        description=["Bonificación a aguante, cordura o preparación igual al grado (elige uno)."]
     ),
     "insignia": Jewelry(
         category="Insignia",
@@ -530,6 +556,7 @@ def create_player():
     competences.add_competence("specialization", "Acrobacias", 3)
     competences.add_competence("specialization", "Equitación", 3)
     competences.add_competence("specialization", "Equilibrio", 3)
+    competences.add_competence("specialization", "Enfoque", 3)
     competences.add_competence("martial", "Khopesh", 5)
     competences.add_competence("martial", "Evasion", 4)
     competences.add_competence("resistance", "Veneno", 3)
@@ -563,10 +590,6 @@ def create_player():
         tenacity=characteristics.tenacity
     )
 
-    specializations = Specializations()
-    specializations.create_specialization("Vigor", "Habilidades Físicas", "strength")
-    specializations.create_specialization("Acrobacias", "Habilidades Físicas", "agility")
-
     player = Player(
         name="Aragorn",
         species=species,
@@ -576,7 +599,6 @@ def create_player():
         fatigue=fatigue,
         sanity=sanity,
         instinctive_reactions=instinctive_reactions,
-        specializations=specializations,
         competences=competences
     )
 
@@ -588,12 +610,15 @@ def create_player():
     intermediate_armor = armors["armadura_intermedia"]
     shield = shields["escudo_mediano"]
     intermediate_pants = leg_armors["pantalones_intermedios"]
-    light_boots = boots["botas_pesadas"]
+    light_boots = boots["botas_intermedias"]
+    light_bracers = bracers["brazales_ligeros"]
+    light_helmet = helmets["casco_pesado"]
     player.inventory.equip_item(light_boots, "boots", grade=2)
     player.inventory.equip_item(intermediate_armor, "armor", grade=2)
     player.inventory.equip_item(shield, "shield", grade=2)
     player.inventory.equip_item(intermediate_pants, "pants", grade=2)
-
+    player.inventory.equip_item(light_bracers, "bracers", grade=2)
+    player.inventory.equip_item(light_helmet, "helmet", grade=2)
     player.update_permanent_bonuses()
 
     return player
@@ -602,6 +627,7 @@ player = create_player()
 
 # Actualizar el nivel del jugador
 player.update_level(5)
+
 # Comprobar los valores
 print(player.health.current_health)
 print(player.health.calculate_renewals(player))
@@ -615,6 +641,7 @@ print(player.calculate_attack_roll("Khopesh"))
 
 # Ejemplo de tirada de defensa
 print(player.calculate_defense_roll())
+
 # Ejemplo de tirada de resistencia
 print(player.calculate_resistance_roll("Veneno"))
 print(player.calculate_resistance_roll("Infeccion"))
@@ -625,6 +652,7 @@ print(player.calculate_resistance_roll("Alteracion", context="Inmovilizado"))
 print(player.calculate_resistance_roll("Alteracion", context="Derribado"))
 print(player.calculate_resistance_roll("Alteracion", context="Desplazado"))
 print(player.calculate_resistance_roll("Alteracion", context="Desequilibrado"))
+
 # Ejemplo de tirada de ataque durante una reacción instintiva
 print(player.calculate_attack_roll("Khopesh", context="reaccion_instintiva"))
 
@@ -645,3 +673,15 @@ print(player.calculate_characteristic_roll("agility"))
 print(player.calculate_specialization_roll("Equilibrio"))
 print(player.calculate_specialization_roll("Equitación"))
 print(player.calculate_specialization_roll("Sigilo"))
+print(player.calculate_specialization_roll("Enfoque"))
+print(player.calculate_specialization_roll("Percepción"))
+
+# Listar todas las especializaciones para verificar su creación
+player.list_specializations()
+player.execute_technique("Visión Elemental")
+player.execute_maneuver("Guardia Elemental")
+player.apply_gift("Visiones Reveladoras")
+print(player.characteristics.preparation)
+print(player.calculate_resistance_roll("Alteracion", context="Conmocionado"))
+print(player.calculate_resistance_roll("Alteracion", context="Cegado"))
+print(player.calculate_resistance_roll("Alteracion", context="Aturdido"))

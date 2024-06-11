@@ -1,4 +1,41 @@
+
 import math
+
+class Ability:
+    def __init__(self, name, type, action_type, element, usage, action_points, range, area, duration, saving_throw, requirement, effect):
+        self.name = name
+        self.type = type 
+        self.action_type = action_type  
+        self.element = element 
+        self.usage = usage  
+        self.action_points = action_points  
+        self.range = range  
+        self.area = area  
+        self.duration = duration  
+        self.saving_throw = saving_throw  
+        self.requirement = requirement  
+        self.effect = effect  
+
+class Technique(Ability):
+    def __init__(self, name, type, action_type, element, usage, action_points, range, area, duration, saving_throw, requirement, effect, attack=None, impact=None, advancements=None):
+        super().__init__(name, type, action_type, element, usage, action_points, range, area, duration, saving_throw, requirement, effect)
+        self.attack = attack  
+        self.impact = impact  
+        self.advancements = advancements if advancements else {}  
+
+class Maneuver(Ability):
+    def __init__(self, name, type, action_type, element, usage, action_points, range, area, duration, saving_throw, requirement, effect, attack=None, impact=None):
+        super().__init__(name, type, action_type, element, usage, action_points, range, area, duration, saving_throw, requirement, effect)
+        self.attack = attack  
+        self.impact = impact  
+
+class Gift(Ability):
+    def __init__(self, name, type, action_type, element, usage, action_points, range, area, duration, saving_throw, requirement, effect):
+        super().__init__(name, type, action_type, element, usage, action_points, range, area, duration, saving_throw, requirement, effect)
+
+techniques = {}
+maneuvers = {}
+gifts = {}
 
 class Species:
     def __init__(self, name, size, base_health, movement_speed, characteristic_bonuses, languages):
@@ -94,6 +131,9 @@ class Helmet(Armor):
         self.te_penalty = te_penalty
         self.description = description if description is not None else ""
 
+    def get_bonus(self, characteristics, competences):
+        return self.bonus(self.grade)
+
 class Shield:
     def __init__(self, category, coverage_bonus, armor_bonus, movement_penalty, weight, grade=1):
         self.category = category
@@ -134,10 +174,11 @@ class Characteristics:
         self.charisma = charisma
         self.composure = composure
         self.presence = presence
+        self.helmet_bonus = 0
 
     @property
     def preparation(self):
-        return math.ceil((self.agility + self.cunning + self.presence) / 3)
+        return math.ceil((self.agility + self.cunning + self.presence) / 3) + self.helmet_bonus
 
     @property
     def resilience(self):
@@ -342,13 +383,13 @@ predefined_specializations = [
     ("Pintura", "Oficios y Artes", "dexterity"),
     ("Danza", "Oficios y Artes", "agility"),
     ("Alquimia", "Oficios y Artes", "intellect"),
-    ("Medicina", "Oficios y Artes", "intellect"),
-    ("Teología", "Oficios y Artes", "intellect"),
-    ("Astronomía", "Oficios y Artes", "intellect"),
-    ("Geografía", "Oficios y Artes", "intellect"),
-    ("Anatomía", "Oficios y Artes", "intellect"),
-    ("Botánica", "Oficios y Artes", "wisdom"),
-    ("Historiografía", "Oficios y Artes", "intellect")
+    ("Medicina", "Saberes", "intellect"),
+    ("Teología", "Saberes", "intellect"),
+    ("Astronomía", "Saberes", "intellect"),
+    ("Geografía", "Saberes", "intellect"),
+    ("Anatomía", "Saberes", "intellect"),
+    ("Botánica", "Saberes", "wisdom"),
+    ("Historiografía", "Saberes", "intellect")
 ]
 
 specializations = Specializations()
@@ -385,7 +426,7 @@ class Inventory:
             self.player.calculate_movement_speed()
 
 class Player:
-    def __init__(self, name, species, characteristics, qualities, health, fatigue, sanity, instinctive_reactions, specializations, competences):
+    def __init__(self, name, species, characteristics, qualities, health, fatigue, sanity, instinctive_reactions, competences, resonance_level=1):
         self.name = name
         self.species = species
         self.characteristics = characteristics
@@ -393,13 +434,19 @@ class Player:
         self.health = health
         self.fatigue = fatigue
         self.sanity = sanity
+        self.resonance_level = resonance_level
         self.instinctive_reactions = instinctive_reactions
-        self.specializations = specializations
         self.competences = competences
+        self.specializations = Specializations()
+        self.initialize_specializations()
         self.inventory = Inventory(self)
         self.update_permanent_bonuses()
         self.calculate_movement_speed()
 
+    def initialize_specializations(self):
+        for name, category, characteristic in predefined_specializations:
+            self.specializations.create_specialization(name, category, characteristic)
+            
     def update_level(self, new_level):
         self.qualities.player_level = new_level
         self.health.current_health = self.health.calculate_health(new_level)
@@ -414,6 +461,7 @@ class Player:
         self.calculate_movement_speed()
 
     def update_permanent_bonuses(self):
+        self.update_helmet_bonus()
         self.reset_competence_bonuses()
         self.calculate_movement_speed()
 
@@ -439,9 +487,18 @@ class Player:
         penalty = 0
         if context == "reaccion_instintiva":
             penalty = self.get_leg_armor_penalty("ataque")
-        total_bonus = weapon_bonus + penalty
+            bracer_bonus = self.get_bracer_bonus("ataque")
+            total_bonus = weapon_bonus + penalty + bracer_bonus
+        else:
+            total_bonus = weapon_bonus + penalty
         roll_description = f"1d10 + {total_bonus}"
         return roll_description
+
+    def get_bracer_bonus(self, context):
+        bracers = self.inventory.equipped.get("bracers", None)
+        if bracers and context == "ataque" and bracers.category == "Ligero":
+            return bracers.bonus(self.characteristics, self.competences, bracers.grade)
+        return 0
 
     def get_armor_bonus(self):
         armor = self.inventory.equipped["armor"]
@@ -560,6 +617,24 @@ class Player:
             return leg_armor.get_descriptions()
         return []
 
+    def get_boots_armor_descriptions(self):
+        boot_armor = self.inventory.equipped["boots"]
+        if boot_armor:
+            return boot_armor.get_descriptions()
+        return []
+    
+    def get_bracers_armor_descriptions(self):
+        bracers_armor = self.inventory.equipped["bracers"]
+        if bracers_armor:
+            return bracers_armor.get_descriptions()
+        return []
+    
+    def get_helmet_armor_descriptions(self):
+        helmet_armor = self.inventory.equipped["helmet"]
+        if helmet_armor:
+            return helmet_armor.get_descriptions()
+        return []
+    
     def calculate_resistance_roll(self, agravio, context=None):
         if agravio in ["Veneno", "Infeccion"]:
             resistance_bonus = self.characteristics.tenacity
@@ -578,6 +653,9 @@ class Player:
 
             if context in ["Desplazado", "Derribado", "Desequilibrado"]:
                 resistance_bonus += self.get_resistance_bonus(context)
+
+            if context in ["Conmocionado", "Cegado", "Aturdido"]:
+                resistance_bonus += self.get_helmet_bonus(context)
         else:
             return f"Tipo de agravio desconocido: {agravio}"
 
@@ -585,6 +663,24 @@ class Player:
         roll_description = f"1d10 + {total_bonus}"
         return roll_description
 
+    def get_helmet_bonus(self, context):
+        helmet = self.inventory.equipped.get("helmet", None)
+        if helmet:
+            if context == "focus" and helmet.category == "Intermedio":
+                return helmet.get_bonus(self.characteristics, self.competences)
+            elif context in ["Conmocionado", "Cegado", "Aturdido"] and helmet.category == "Pesado":
+                return helmet.grade 
+        return 0
+    
+    def get_helmet_perception_penalty(self):
+        helmet = self.inventory.equipped.get("helmet", None)
+        if helmet:
+            if helmet.category == "Intermedio":
+                return -helmet.grade
+            elif helmet.category == "Pesado":
+                return -(helmet.grade + 1)
+        return 0
+    
     def add_specialization(self, specialization_name, category="Oficios y Artes", characteristic="intellect"):
         if specialization_name not in self.specializations.specializations:
             # Encontrar la característica correcta para la especialización desde la lista predefinida
@@ -604,9 +700,16 @@ class Player:
         else:
             print(f"Specialization {specialization_name} not found.")
 
+    def update_helmet_bonus(self):
+        helmet = self.inventory.equipped.get("helmet", None)
+        if helmet and helmet.category == "Ligero":
+            self.characteristics.helmet_bonus = helmet.get_bonus(self.characteristics, self.competences)
+        else:
+            self.characteristics.helmet_bonus = 0
+
     def calculate_specialization_roll(self, specialization_name):
-        # Verificar si la especialización ya existe en las competencias del jugador
-        if specialization_name not in self.competences.specializations:
+        # Verificar si la especialización ya existe en la lista de competencias predefinida
+        if specialization_name not in [name for name, category, characteristic in predefined_specializations]:
             self.add_specialization(specialization_name)
 
         # Acceder a los niveles y rangos de la especialización existente
@@ -614,7 +717,6 @@ class Player:
         specialization_rank = self.competences.get_rank("specialization", specialization_name)
         characteristic_name = self.specializations.get_specialization_characteristic(specialization_name)
         characteristic = getattr(self.characteristics, characteristic_name) if characteristic_name else 0
-
         # Calcular el bono total
         bonus = 0
         if specialization_name == "Sigilo":
@@ -625,8 +727,12 @@ class Player:
             bonus = self.get_leg_armor_bonus("vigor")
         elif specialization_name in ["Equilibrio", "Equitación"]:
             bonus = self.get_specialization_bonus(specialization_name)
+        elif specialization_name == "Enfoque":
+            bonus = self.get_helmet_bonus("focus")
+        
+        helmet_penalty = self.get_helmet_perception_penalty() if specialization_name == "Percepción" else 0
 
-        total_bonus = specialization_level + specialization_rank + characteristic + bonus
+        total_bonus = specialization_level + specialization_rank + characteristic + bonus + helmet_penalty
         roll_description = f"1d10 + {total_bonus}"
         return roll_description
 
@@ -666,3 +772,38 @@ class Player:
 
     def get_equipment_bonus(self, category, name):
         return 0
+    
+    def list_specializations(self):
+        for name, specialization in self.specializations.specializations.items():
+            print(f"Specialization: {name}, Category: {specialization.category}, Characteristic: {specialization.characteristic}")
+
+    def execute_technique(self, technique_name):
+        technique = techniques.get(technique_name)
+        if technique:
+            print(f"Técnica {technique.name}: {technique.effect}")
+            if self.resonance_level > 1:
+                for level in range(2, self.resonance_level + 1):
+                    if level in technique.advancements:
+                        print(f"Avance Nivel {level}: {technique.advancements[level]}")
+            # Aquí puedes añadir lógica para aplicar los efectos, coste de acción, etc.
+        else:
+            print(f"Técnica {technique_name} no encontrada.")
+
+    def execute_maneuver(self, maneuver_name):
+        maneuver = maneuvers.get(maneuver_name)
+        if maneuver:
+            print(f"Maniobra {maneuver.name}: {maneuver.effect}")
+            # Aquí puedes añadir lógica para aplicar los efectos, coste de acción, etc.
+        else:
+            print(f"Maniobra {maneuver_name} no encontrada.")
+
+    def apply_gift(self, gift_name):
+        gift = gifts.get(gift_name)
+        if gift:
+            print(f"Don {gift.name} aplicado: {gift.effect}")
+            # Aquí puedes añadir lógica para aplicar los efectos, etc.
+        else:
+            print(f"Don {gift_name} no encontrado.")
+
+    def set_resonance_level(self, level):
+        self.resonance_level = level
