@@ -1,4 +1,3 @@
-
 import math
 
 class Ability:
@@ -135,7 +134,8 @@ class Helmet(Armor):
         return self.bonus(self.grade)
 
 class Shield:
-    def __init__(self, category, coverage_bonus, armor_bonus, movement_penalty, weight, grade=1):
+    def __init__(self, name, category, coverage_bonus, armor_bonus, movement_penalty, weight, grade=1):
+        self.name = name 
         self.category = category
         self.coverage_bonus = coverage_bonus
         self.armor_bonus = armor_bonus
@@ -151,17 +151,29 @@ class Shield:
         return self.armor_bonus
 
 class Jewelry:
-    def __init__(self, category, bonus, weight, description=None):
+    def __init__(self, name, category, bonus, weight, grade=1, choice=None, description=None):
+        self.name = name
         self.category = category
         self.bonus = bonus
         self.weight = weight
+        self.grade = grade
+        self.choice = choice
         self.description = description if description is not None else ""
 
-    def apply_bonus(self, characteristics, competencies, grade, choice=None):
+    def apply_bonus(self, player, grade, choice=None):
+        self.grade = grade
+        self.choice = choice
+        player.characteristics.amulet_bonus = 0
         if self.category == "Amuleto" and choice:
-            return self.bonus(characteristics, competencies, grade, choice)
-        else:
-            return self.bonus(characteristics, competencies, grade)
+            if choice == "aguante":
+                player.fatigue.amulet_bonus = grade
+            elif choice == "cordura":
+                player.sanity.amulet_bonus = grade
+            elif choice == "preparacion":
+                player.characteristics.amulet_bonus = grade
+        elif self.category == "Insignia":
+            player.characteristics.insignia_bonus = self.bonus(player.characteristics, player.competences, grade)
+        return grade
 
 class Characteristics:
     def __init__(self, strength, agility, tenacity, cunning, intellect, wisdom, charisma, composure, presence):
@@ -175,10 +187,11 @@ class Characteristics:
         self.composure = composure
         self.presence = presence
         self.helmet_bonus = 0
+        self.amulet_bonus = 0
 
     @property
     def preparation(self):
-        return math.ceil((self.agility + self.cunning + self.presence) / 3) + self.helmet_bonus
+        return math.ceil((self.agility + self.cunning + self.presence) / 3) + self.helmet_bonus + self.amulet_bonus
 
     @property
     def resilience(self):
@@ -233,10 +246,11 @@ class Fatigue:
     def __init__(self, tenacity):
         self.tenacity = tenacity
         self.fatigue_accumulated = 0
+        self.amulet_bonus = 0
 
     def calculate_endurance(self, player):
         vigor_competence = player.competences.get_bonus("specialization", "Vigor")
-        return self.tenacity + (vigor_competence // 2)
+        return self.tenacity + (vigor_competence // 2) + self.amulet_bonus
 
     def calculate_fatigue(self, player):
         return max(0, self.fatigue_accumulated - self.calculate_endurance(player))
@@ -257,10 +271,11 @@ class Sanity:
     def __init__(self, composure):
         self.composure = composure
         self.disorders = 0
+        self.amulet_bonus = 0
 
     @property
     def sanity(self):
-        return self.composure * 2
+        return self.composure * 2 + self.amulet_bonus
 
     def calculate_sanity(self):
         return max(0, self.disorders - self.sanity)
@@ -417,11 +432,15 @@ class Inventory:
     def add_item(self, item):
         self.items.append(item)
 
-    def equip_item(self, item, slot, grade=None):
+    def equip_item(self, item, slot, grade=None, choice=None):
         if slot in self.equipped:
             if grade is not None and hasattr(item, 'grade'):
                 item.grade = grade
+            if choice is not None and hasattr(item, 'choice'):
+                item.choice = choice
             self.equipped[slot] = item
+            if isinstance(item, Jewelry):
+                item.apply_bonus(self.player, grade, choice)
             self.player.update_permanent_bonuses()
             self.player.calculate_movement_speed()
 
@@ -446,7 +465,16 @@ class Player:
     def initialize_specializations(self):
         for name, category, characteristic in predefined_specializations:
             self.specializations.create_specialization(name, category, characteristic)
-            
+
+    def update_amulet_bonus(self):
+        amulet = self.inventory.equipped.get("amulet", None)
+        if amulet and amulet.category == "Amuleto":
+            self.characteristics.amulet_bonus = amulet.apply_bonus(self, amulet.grade, amulet.choice)
+        else:
+            self.characteristics.endurance_bonus = 0
+            self.characteristics.sanity_bonus = 0
+            self.characteristics.preparation_bonus = 0
+
     def update_level(self, new_level):
         self.qualities.player_level = new_level
         self.health.current_health = self.health.calculate_health(new_level)
@@ -461,6 +489,7 @@ class Player:
         self.calculate_movement_speed()
 
     def update_permanent_bonuses(self):
+        self.update_amulet_bonus()
         self.update_helmet_bonus()
         self.reset_competence_bonuses()
         self.calculate_movement_speed()
@@ -729,6 +758,11 @@ class Player:
             bonus = self.get_specialization_bonus(specialization_name)
         elif specialization_name == "Enfoque":
             bonus = self.get_helmet_bonus("focus")
+        elif specialization_name == "Influencia":
+            badge = self.inventory.equipped.get("pendant", None)
+            if badge and badge.category == "Insignia":
+                bonus = badge.bonus(self.characteristics, self.competences, badge.grade)
+
         
         helmet_penalty = self.get_helmet_perception_penalty() if specialization_name == "Percepción" else 0
 

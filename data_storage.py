@@ -169,16 +169,16 @@ def pendant_bonus(characteristics, competencies, grade):
     return grade
 
 def amulet_bonus(characteristics, competencies, grade, choice):
+    print(f"Calculando bono del amuleto: choice {choice}, grade {grade}")  # Agregar esta línea
     if choice == "aguante":
-        characteristics["aguante"] += grade
+        characteristics.endurance_bonus += grade
     elif choice == "cordura":
-        characteristics["cordura"] += grade
+        characteristics.sanity_bonus += grade
     elif choice == "preparacion":
-        characteristics["preparacion"] += grade
+        characteristics.preparation_bonus += grade
     return grade
 
 def badge_bonus(characteristics, competencies, grade):
-    competencies["influencia"] += grade
     return grade
 
 armors = {
@@ -332,6 +332,7 @@ helmets = {
 
 shields = {
     "escudo_liviano": Shield(
+        name="Escudo Liviano",
         category="Liviano",
         coverage_bonus=None,
         armor_bonus=None,
@@ -339,6 +340,7 @@ shields = {
         weight=2
     ),
     "escudo_mediano": Shield(
+        name="Escudo Mediano",
         category="Mediano",
         coverage_bonus="Cobertura Ligera",
         armor_bonus=lambda grade: grade,
@@ -346,6 +348,7 @@ shields = {
         weight=5
     ),
     "escudo_pesado": Shield(
+        name="Escudo Pesado",
         category="Pesado",
         coverage_bonus="Cobertura Media",
         armor_bonus=lambda grade: grade * 2,
@@ -356,18 +359,21 @@ shields = {
 
 jewelry = {
     "colgante": Jewelry(
+        name="Colgante",
         category="Colgante",
         bonus=None,
         weight=1,
         description="Permite utilizar objetos sin utilizar la acción Interactuar."
     ),
     "amuleto": Jewelry(
+        name="Amuleto",
         category="Amuleto",
         bonus=amulet_bonus,
         weight=0.1,
         description=["Bonificación a aguante, cordura o preparación igual al grado (elige uno)."]
     ),
     "insignia": Jewelry(
+        name="Insignia",
         category="Insignia",
         bonus=badge_bonus,
         weight=0.1
@@ -612,7 +618,11 @@ def create_player():
     intermediate_pants = leg_armors["pantalones_intermedios"]
     light_boots = boots["botas_intermedias"]
     light_bracers = bracers["brazales_ligeros"]
-    light_helmet = helmets["casco_pesado"]
+    light_helmet = helmets["casco_ligero"]
+    amulet = jewelry["amuleto"]
+    badge = jewelry["insignia"]
+    player.inventory.equip_item(badge, "pendant", grade=2)
+    player.inventory.equip_item(amulet, "amulet", grade=2, choice="aguante")
     player.inventory.equip_item(light_boots, "boots", grade=2)
     player.inventory.equip_item(intermediate_armor, "armor", grade=2)
     player.inventory.equip_item(shield, "shield", grade=2)
@@ -675,6 +685,7 @@ print(player.calculate_specialization_roll("Equitación"))
 print(player.calculate_specialization_roll("Sigilo"))
 print(player.calculate_specialization_roll("Enfoque"))
 print(player.calculate_specialization_roll("Percepción"))
+print(player.calculate_specialization_roll("Influencia"))
 
 # Listar todas las especializaciones para verificar su creación
 player.list_specializations()
@@ -685,3 +696,6 @@ print(player.characteristics.preparation)
 print(player.calculate_resistance_roll("Alteracion", context="Conmocionado"))
 print(player.calculate_resistance_roll("Alteracion", context="Cegado"))
 print(player.calculate_resistance_roll("Alteracion", context="Aturdido"))
+print(f"Aguante: {player.fatigue.calculate_endurance(player)}")
+print(f"Cordura: {player.sanity.sanity}")
+print(f"Preparación: {player.characteristics.preparation}")
