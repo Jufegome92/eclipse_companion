@@ -493,7 +493,7 @@ species_data = {
         characteristic_bonuses={"agility": 1, "wisdom": 1, "composure": 1},
         languages={"Común": "rango3", "Grog": "rango3"}
     ),
-    "Pteropido": Species(
+    "Vesper": Species(
         name="Pteropido",
         size="Mediano",
         base_health=9,
@@ -501,16 +501,16 @@ species_data = {
         characteristic_bonuses={"strength": 1, "intellect": 1, "presence": 1},
         languages={"Común": "rango3", "Sangrath": "rango3"}
     ),
-    "Lepori": Species(
-        name="Lepori",
+    "Lapinni": Species(
+        name="Lapinni",
         size="Pequeño",
         base_health=8,
         movement_speed=12,
         characteristic_bonuses={"agility": 1, "cunning": 1, "charisma": 1},
         languages={"Común": "rango3", "Lepori": "rango3"}
     ),
-    "Gryllarch": Species(
-        name="Gryllarch",
+    "Manto": Species(
+        name="Manto",
         size="Mediano",
         base_health=10,
         movement_speed=11,
@@ -525,16 +525,16 @@ species_data = {
         characteristic_bonuses={"tenacity": 1, "intellect": 1, "charisma": 1},
         languages={"Común": "rango3", "Hystric": "rango3"}
     ),
-    "Talpi": Species(
-        name="Talpi",
+    "Talpa": Species(
+        name="Talpa",
         size="Mediano",
         base_health=9,
         movement_speed=9,
         characteristic_bonuses={"agility": 1, "cunning": 1, "composure": 1},
         languages={"Común": "rango3", "Talpi": "rango3"}
     ),
-    "Murin": Species(
-        name="Murin",
+    "Myo": Species(
+        name="Myo",
         size="Pequeño",
         base_health=8,
         movement_speed=12,
@@ -692,7 +692,6 @@ player.list_specializations()
 player.execute_technique("Visión Elemental")
 player.execute_maneuver("Guardia Elemental")
 player.apply_gift("Visiones Reveladoras")
-print(player.characteristics.preparation)
 print(player.calculate_resistance_roll("Alteracion", context="Conmocionado"))
 print(player.calculate_resistance_roll("Alteracion", context="Cegado"))
 print(player.calculate_resistance_roll("Alteracion", context="Aturdido"))
