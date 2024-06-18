@@ -398,7 +398,7 @@ predefined_specializations = [
     ("Pintura", "Oficios y Artes", "wisdom"),
     ("Danza", "Oficios y Artes", "wisdom"),
     ("Alquimia", "Oficios y Artes", "wisdom"),
-    ("Medicina", "Saberes", "intellect"),
+    ("Medicina", "Oficios y Artes", "wisdom"),
     ("Teología", "Saberes", "intellect"),
     ("Astronomía", "Saberes", "intellect"),
     ("Geografía", "Saberes", "intellect"),
