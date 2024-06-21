@@ -176,14 +176,14 @@ class Jewelry:
         return grade
 
 class Characteristics:
-    def __init__(self, strength, agility, tenacity, cunning, intellect, wisdom, charisma, composure, presence):
+    def __init__(self, strength, agility, tenacity, cunning, intellect, wisdom, empathy, composure, presence):
         self.strength = strength
         self.agility = agility
         self.tenacity = tenacity
         self.cunning = cunning
         self.intellect = intellect
         self.wisdom = wisdom
-        self.charisma = charisma
+        self.empathy = empathy
         self.composure = composure
         self.presence = presence
         self.helmet_bonus = 0
@@ -385,9 +385,10 @@ predefined_specializations = [
     ("Supervivencia", "Habilidades Mentales", "cunning"),
     ("Enfoque", "Habilidades Mentales", "composure"),
     ("Engaño", "Habilidades Mentales", "cunning"),
+    ("Intimidación", "Habilidades Sociales","presence")
     ("Influencia", "Habilidades Sociales", "presence"),
     ("Sigilo", "Habilidades Sociales", "presence"),
-    ("Domesticación", "Habilidades Sociales", "charisma"),
+    ("Domesticación", "Habilidades Sociales", "presence"),
     ("Herrería", "Oficios y Artes", "wisdom"),
     ("Trampas", "Oficios y Artes", "wisdom"),
     ("Carpintería", "Oficios y Artes", "wisdom"),
@@ -398,7 +399,7 @@ predefined_specializations = [
     ("Pintura", "Oficios y Artes", "wisdom"),
     ("Danza", "Oficios y Artes", "wisdom"),
     ("Alquimia", "Oficios y Artes", "wisdom"),
-    ("Medicina", "Oficios y Artes", "wisdom"),
+    ("Sanación", "Oficios y Artes", "wisdom"),
     ("Teología", "Saberes", "intellect"),
     ("Astronomía", "Saberes", "intellect"),
     ("Geografía", "Saberes", "intellect"),

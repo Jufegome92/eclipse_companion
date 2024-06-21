@@ -517,7 +517,7 @@ species_data = {
         characteristic_bonuses={"strength": 1, "wisdom": 1, "composure": 1},
         languages={"Común": "rango3", "Gryllarch": "rango3"}
     ),
-    "Hystric": Species(
+    "Erin": Species(
         name="Hystric",
         size="Mediano",
         base_health=9,
