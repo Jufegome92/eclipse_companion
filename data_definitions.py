@@ -384,28 +384,27 @@ predefined_specializations = [
     ("Percepción", "Habilidades Mentales", "wisdom"),
     ("Supervivencia", "Habilidades Mentales", "cunning"),
     ("Enfoque", "Habilidades Mentales", "composure"),
-    ("Engaño", "Habilidades Mentales", "cunning"),
-    ("Intimidación", "Habilidades Sociales","presence")
+    ("Engaño", "Habilidades Sociales", "cunning"),
     ("Influencia", "Habilidades Sociales", "presence"),
+    ("Intimidación", "Habilidades Sociales","presence")
     ("Sigilo", "Habilidades Sociales", "presence"),
     ("Domesticación", "Habilidades Sociales", "presence"),
     ("Herrería", "Oficios y Artes", "wisdom"),
     ("Trampas", "Oficios y Artes", "wisdom"),
-    ("Carpintería", "Oficios y Artes", "wisdom"),
     ("Joyería", "Oficios y Artes", "wisdom"),
     ("Sastrería", "Oficios y Artes", "wisdom"),
+    ("Ingeniería","Oficios y Artes", "wisdom")
     ("Minería", "Oficios y Artes", "wisdom"),
+    ("Herboristería", "Oficios y Artes", "wisdom"),
     ("Música", "Oficios y Artes", "wisdom"),
     ("Pintura", "Oficios y Artes", "wisdom"),
     ("Danza", "Oficios y Artes", "wisdom"),
     ("Alquimia", "Oficios y Artes", "wisdom"),
-    ("Sanación", "Oficios y Artes", "wisdom"),
+    ("Medicina", "Oficios y Artes", "wisdom"),
     ("Teología", "Saberes", "intellect"),
     ("Astronomía", "Saberes", "intellect"),
     ("Geografía", "Saberes", "intellect"),
-    ("Anatomía", "Saberes", "intellect"),
-    ("Botánica", "Saberes", "Intellect"),
-    ("Historiografía", "Saberes", "intellect"),
+    ("Historia", "Saberes", "intellect"),
     ("Taumaturgia","Saberes","Intellect")
 ]
 
