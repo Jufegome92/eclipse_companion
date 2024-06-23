@@ -386,14 +386,14 @@ predefined_specializations = [
     ("Enfoque", "Habilidades Mentales", "composure"),
     ("Engaño", "Habilidades Sociales", "cunning"),
     ("Influencia", "Habilidades Sociales", "presence"),
-    ("Intimidación", "Habilidades Sociales","presence")
+    ("Intimidación", "Habilidades Sociales","presence"),
     ("Sigilo", "Habilidades Sociales", "presence"),
     ("Domesticación", "Habilidades Sociales", "presence"),
     ("Herrería", "Oficios y Artes", "wisdom"),
     ("Trampas", "Oficios y Artes", "wisdom"),
     ("Joyería", "Oficios y Artes", "wisdom"),
     ("Sastrería", "Oficios y Artes", "wisdom"),
-    ("Ingeniería","Oficios y Artes", "wisdom")
+    ("Ingeniería","Oficios y Artes", "wisdom"),
     ("Minería", "Oficios y Artes", "wisdom"),
     ("Herboristería", "Oficios y Artes", "wisdom"),
     ("Música", "Oficios y Artes", "wisdom"),

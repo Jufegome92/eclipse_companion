@@ -552,7 +552,7 @@ def create_player():
         cunning=13 + species.characteristic_bonuses.get("cunning", 0),
         intellect=15 + species.characteristic_bonuses.get("intellect", 0),
         wisdom=11 + species.characteristic_bonuses.get("wisdom", 0),
-        charisma=9 + species.characteristic_bonuses.get("charisma", 0),
+        empathy=9 + species.characteristic_bonuses.get("empathy", 0),
         composure=8 + species.characteristic_bonuses.get("composure", 0),
         presence=7 + species.characteristic_bonuses.get("presence", 0)
     )
@@ -670,7 +670,7 @@ print(player.calculate_attack_roll("Khopesh", context="reaccion_instintiva"))
 for description in player.get_leg_armor_descriptions():
     print(description)
 
-for characteristic in ["strength", "agility", "tenacity", "cunning", "intellect", "wisdom", "charisma", "composure", "presence"]:
+for characteristic in ["strength", "agility", "tenacity", "cunning", "intellect", "wisdom", "empathy", "composure", "presence"]:
     print(f"{characteristic.capitalize()} Roll: {player.calculate_characteristic_roll(characteristic)}")
 
 print(player.calculate_impact_roll("Khopesh"))
